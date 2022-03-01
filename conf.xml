@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><SKY_AUTHENTICATOR>
+    <UNDERTOW>
+        <PORT>8081</PORT>
+        <HOST>0.0.0.0</HOST>
+    </UNDERTOW>
+
+    <POSTGRESSDATABASE>
+        <DBHOST>172.16.227.128</DBHOST>
+        <DBPORT>:5432</DBPORT>
+        <DBNAME>/sky_authenticator</DBNAME>
+        <USER>damark</USER>
+        <PASSWORD TYPE="ENCRYPTED">8A828TbESkyNoKs3puqTxw==</PASSWORD>
+    </POSTGRESSDATABASE>
+
+    <TOKENS>
+        <ACCESS_TOKEN_TTL>30</ACCESS_TOKEN_TTL>
+        <ACCESS_TOKEN_TTL_UNITS>minutes</ACCESS_TOKEN_TTL_UNITS>
+
+        <AUTH_CODE_TTL >10</AUTH_CODE_TTL>
+        <AUTH_CODE_LENGTH>7</AUTH_CODE_LENGTH>
+        <AUTH_CODE_TTL_UNITS>seconds</AUTH_CODE_TTL_UNITS>
+
+    </TOKENS>
+
+
+</SKY_AUTHENTICATOR>
