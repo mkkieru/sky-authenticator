@@ -1,7 +1,7 @@
 package ke.co.skyworld.query_manager;
 
-import ke.co.skyworld.ResponseCodes;
-import ke.co.skyworld.XmlReader;
+import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
+import ke.co.skyworld.XmlReader.XmlReader;
 import ke.co.skyworld.model.NamedPreparedStatement;
 
 import java.sql.DriverManager;

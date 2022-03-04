@@ -1,23 +1,28 @@
 package ke.co.skyworld;
 
 import io.undertow.server.handlers.BlockingHandler;
-import ke.co.skyworld.auth_details.CreateAuthDetails;
-import ke.co.skyworld.auth_details.GetAuthDetails;
-import ke.co.skyworld.authorizations.Login;
-import ke.co.skyworld.authorizations.Auth_code_confirmation;
-import ke.co.skyworld.identifier_confirmation.add_to_identifier_confirmation;
-import ke.co.skyworld.identifier_confirmation.get_identifier_confirmation;
-import ke.co.skyworld.identifier.AddIdentifier;
-import ke.co.skyworld.identifier.GetIdentifiers;
-import ke.co.skyworld.identifier.confirmIdentifier;
-import ke.co.skyworld.identifier_type.AddIdentifierType;
-import ke.co.skyworld.identifier_type.GetIdentifierType;
+import ke.co.skyworld.EndPoints.users.CreateUsers;
+import ke.co.skyworld.EndPoints.users.GetSpecificUser;
+import ke.co.skyworld.EndPoints.users.GetUsers;
+import ke.co.skyworld.EndPoints.users.UpdateUser;
+import ke.co.skyworld.UTILS.Dispatcher;
+import ke.co.skyworld.EndPoints.auth_details.CreateAuthDetails;
+import ke.co.skyworld.EndPoints.auth_details.GetAuthDetails;
+import ke.co.skyworld.EndPoints.authorizations.Login;
+import ke.co.skyworld.EndPoints.authorizations.Auth_code_confirmation;
+import ke.co.skyworld.EndPoints.confirmation.SendConfirmationDetails;
+import ke.co.skyworld.EndPoints.identifier_confirmation.add_to_identifier_confirmation;
+import ke.co.skyworld.EndPoints.identifier_confirmation.get_identifier_confirmation;
+import ke.co.skyworld.EndPoints.identifier.AddIdentifier;
+import ke.co.skyworld.EndPoints.identifier.GetIdentifiers;
+import ke.co.skyworld.EndPoints.identifier.confirmIdentifier;
+import ke.co.skyworld.EndPoints.identifier_type.AddIdentifierType;
+import ke.co.skyworld.EndPoints.identifier_type.GetIdentifierType;
 import io.undertow.Handlers;
 import io.undertow.server.RoutingHandler;
-import ke.co.skyworld.programs.CreateProgram;
-import ke.co.skyworld.programs.UpdatePrograms;
-import ke.co.skyworld.programs.GetPrograms;
-import ke.co.skyworld.users.*;
+import ke.co.skyworld.EndPoints.programs.CreateProgram;
+import ke.co.skyworld.EndPoints.programs.UpdatePrograms;
+import ke.co.skyworld.EndPoints.programs.GetPrograms;
 
 public class UndertowRoutes {
 
@@ -60,7 +65,10 @@ public class UndertowRoutes {
                 .get("", new Dispatcher(new get_identifier_confirmation()))
                 .post("", new BlockingHandler(new add_to_identifier_confirmation()));
     }
-
+    public static RoutingHandler auth_code_confirmation(){
+        return Handlers.routing()
+                .post("", new Dispatcher(new SendConfirmationDetails()));
+    }
     public static RoutingHandler auth_details(){
         return Handlers.routing()
                 .get("", new Dispatcher(new GetAuthDetails()))

@@ -2,6 +2,8 @@ package ke.co.skyworld;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.StatusCodes;
+import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
+import ke.co.skyworld.UserResponse.ApiResponse;
 import ke.co.skyworld.query_manager.Query_manager;
 
 import java.sql.Timestamp;
@@ -10,7 +12,7 @@ import java.util.LinkedHashMap;
 
 public class CheckAuthCodes {
 
-    public static ResponseCodes checkAndUpdateAccessTokens(HttpServerExchange exchange,String token, String user_ip_address) throws Exception {
+    public static ResponseCodes checkAndUpdateAccessTokens(HttpServerExchange exchange, String token, String user_ip_address) throws Exception {
 
         Query_manager usersDao = new Query_manager();
 
