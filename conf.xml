@@ -5,11 +5,11 @@
     </UNDERTOW>
 
     <POSTGRESSDATABASE>
-        <DBHOST>172.16.227.131</DBHOST>
+        <DBHOST>ec2-3-230-238-86.compute-1.amazonaws.com</DBHOST>
         <DBPORT>:5432</DBPORT>
-        <DBNAME>/sky_authenticator</DBNAME>
-        <USER>damark</USER>
-        <PASSWORD TYPE="ENCRYPTED">8A828TbESkyNoKs3puqTxw==</PASSWORD>
+        <DBNAME>/d8nu1icv0pdf0n</DBNAME>
+        <USER>wbjigrkceveqjs</USER>
+        <PASSWORD TYPE="CLEARTEXT">865017d57bf72e14a86bb93fc6ea4c10e9444bff1532f497e33e39aa015a2e5b</PASSWORD>
     </POSTGRESSDATABASE>
 
     <TOKENS>
