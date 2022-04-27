@@ -6,7 +6,7 @@ import io.undertow.util.StatusCodes;
 import ke.co.skyworld.UserResponse.ApiResponse;
 import ke.co.skyworld.CheckAuthCodes;
 import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
-import ke.co.skyworld.query_manager.Query_manager;
+import ke.co.skyworld.query_manager.QueryManager;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,15 +26,14 @@ public class GetIdentifierType implements HttpHandler {
         }
 
         String sqlQuery = "SELECT * FROM public.identifier_type";
-        Query_manager usersDao = new Query_manager();
+        QueryManager usersDao = new QueryManager();
 
         List<LinkedHashMap<String,Object>> values = usersDao.getAll(sqlQuery);
 
-        ResponseCodes responseCodes = CheckAuthCodes.checkAndUpdateAccessTokens(exchange,access_token, String.valueOf(exchange.getSourceAddress()));
+        ResponseCodes responseCodes = CheckAuthCodes.checkAndUpdateAccessTokens(exchange, access_token, exchange.getSourceAddress().getAddress().toString().replace("/", ""));
+
 
         if (responseCodes == ResponseCodes.ERROR) {
-            error.put("Error", "Please log in to continue ");
-            ApiResponse.sendResponse(exchange, error, StatusCodes.BAD_REQUEST);
             return;
         } else if (responseCodes == ResponseCodes.SUCCESS) {
 

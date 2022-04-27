@@ -9,7 +9,7 @@ import ke.co.skyworld.UserResponse.ApiResponse;
 import ke.co.skyworld.CheckAuthCodes;
 import ke.co.skyworld.UTILS.ExchangeUtils;
 import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
-import ke.co.skyworld.query_manager.Query_manager;
+import ke.co.skyworld.query_manager.QueryManager;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class AddIdentifierType implements HttpHandler {
             return;
         }
 
-        Query_manager usersDao = new Query_manager();
+        QueryManager usersDao = new QueryManager();
         String sqlQuery = "INSERT INTO public.identifier_type (identifier_type) VALUES (:identifier_type) RETURNING identifier_type";
 
         Type type = new TypeToken<LinkedHashMap<String, Object>>() {
