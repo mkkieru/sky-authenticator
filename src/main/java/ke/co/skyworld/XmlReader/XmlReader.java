@@ -1,12 +1,11 @@
 package ke.co.skyworld.XmlReader;
 
-import ke.co.skyworld.Encryption.AES_EncryptionUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
+import ke.co.skyworld.Encryption.AESEncryptionUtil;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -81,7 +80,7 @@ public class XmlReader {
                 AUTH_CODE_TTL_UNITS = xp.compile("./AUTH_CODE_TTL_UNITS").evaluate(nl2.item(0));
 
                 //Encrypt database password
-                encryptedPassword = AES_EncryptionUtil.encrypt(DatabasePassword);
+                encryptedPassword = AESEncryptionUtil.encrypt(DatabasePassword);
 
                 //Write back to conf.xml file to save back encrypted password
                 node.getAttributes().getNamedItem("TYPE").setTextContent("ENCRYPTED");
@@ -93,7 +92,6 @@ public class XmlReader {
                 StreamResult result = new StreamResult(new File("conf.xml"));
                 transformer.transform(source, result);
 
-                System.out.println("Done. Password encrypted");
 
             } else {
                 portNumber = Integer.parseInt(xp.compile("./PORT").evaluate(nl.item(0)));
@@ -105,8 +103,7 @@ public class XmlReader {
                 DatabasePassword = xp.compile("./PASSWORD").evaluate(nl1.item(0));
 
                 //Decrypt Password
-                decryptedPassword = AES_EncryptionUtil.decrypt(DatabasePassword);
-                System.out.println(decryptedPassword);
+                decryptedPassword = AESEncryptionUtil.decrypt(DatabasePassword);
 
                 accessKeys.put("Port Number", portNumber);
                 accessKeys.put("Host", undertowHost);
