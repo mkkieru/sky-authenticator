@@ -23,25 +23,28 @@ public class CheckAccessTokenValidity implements HttpHandler {
     }
 
     public void handleRequest(HttpServerExchange httpServerExchange) throws Exception {
-        String sqlQuery = "Select age(now(),date_created),user_id  from access_token where user_id = (:user_id) and ip_address= (:ip_address)";
+//        String sqlQuery = "Select age(now(),date_created),user_id  from access_token where user_id = (:user_id) and ip_address = (:ip_address)";
+        String sqlQuery = "Select age(now(),date_created),user_id  from access_token where user_id = (:user_id) ";
         LinkedHashMap<String, Object> error = new LinkedHashMap();
         QueryManager usersDao = new QueryManager();
         Type type = (new TypeToken<LinkedHashMap<String, Object>>() {
         }).getType();
         Gson gson = new Gson();
-        LinkedHashMap userDetails = (LinkedHashMap)gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
+        LinkedHashMap userDetails = gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
+
+        userDetails.remove("ip_address");
 
         try {
             LinkedHashMap<String, Object> databaseResult = usersDao.getUserSpecificAuthDetail(sqlQuery, userDetails);
             if (!databaseResult.isEmpty()) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, Integer> age = (Map)objectMapper.convertValue(databaseResult.get("age"), Map.class);
-                int ageDays = (Integer)age.get("days");
-                if (ageDays >= 14) {
-                    error.put("Message", ResponseCodes.ACCESS_TOKEN_EXPIRED);
-                    ApiResponse.sendResponse(httpServerExchange, error, 401);
-                    return;
-                }
+//                int ageDays = (Integer)age.get("days");
+//                if (ageDays >= 14) {
+//                    error.put("Message", ResponseCodes.ACCESS_TOKEN_EXPIRED);
+//                    ApiResponse.sendResponse(httpServerExchange, error, 401);
+//                    return;
+//                }
 
                 error.put("Message", ResponseCodes.ACCESS_TOKEN_IS_VALID);
                 ApiResponse.sendResponse(httpServerExchange, error, 200);

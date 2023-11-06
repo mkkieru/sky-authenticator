@@ -37,35 +37,37 @@ public class CheckAuthCodes {
             Timestamp now = new Timestamp(System.currentTimeMillis());
             long dateCreatedTime = date_created.getTime();
             long timeNow = now.getTime();
-            if (!user_ip_address.equals(token_ip_address)) {
-                System.out.println("checking ip address... ");
-                error.put("Error", "ip address doesn't match. Please log in again to continue ... ");
-                usersDao.update(sqlQuery2, tokenValue);
-                return ResponseCodes.ERROR;
-            } else {
-                if (timeToLiveUnits.toLowerCase().trim().equals("seconds")) {
-                    if (dateCreatedTime + 1000L * timeToLive < timeNow) {
-                        error.put("Error", ResponseCodes.ACCESS_TOKEN_EXPIRED);
-                        usersDao.update(sqlQuery2, tokenValue);
-                        ApiResponse.sendResponse(exchange, error, 401);
-                        return ResponseCodes.ERROR;
-                    }
-                } else if (timeToLiveUnits.toLowerCase().trim().equals("minutes")) {
-                    if (dateCreatedTime + timeToLive * 60L * 1000L < timeNow) {
-                        error.put("Error", ResponseCodes.ACCESS_TOKEN_EXPIRED);
-                        usersDao.update(sqlQuery2, tokenValue);
-                        ApiResponse.sendResponse(exchange, error, 401);
-                        return ResponseCodes.ERROR;
-                    }
-                } else if (timeToLiveUnits.toLowerCase().trim().equals("hours") && dateCreatedTime + timeToLive * 60L * 60L * 1000L < timeNow) {
-                    error.put("Error", ResponseCodes.ACCESS_TOKEN_EXPIRED);
-                    usersDao.update(sqlQuery2, tokenValue);
-                    ApiResponse.sendResponse(exchange, error, 401);
-                    return ResponseCodes.ERROR;
-                }
-
-                return ResponseCodes.SUCCESS;
-            }
+//            if (!user_ip_address.equals(token_ip_address)) {
+//                System.out.println("checking ip address... ");
+//                error.put("Error", "ip address doesn't match. Please log in again to continue ... ");
+//                usersDao.update(sqlQuery2, tokenValue);
+//                ApiResponse.sendResponse(exchange, error, 401);
+//                return ResponseCodes.ERROR;
+//            } else {
+//                if (timeToLiveUnits.toLowerCase().trim().equals("seconds")) {
+//                    if (dateCreatedTime + 1000L * timeToLive < timeNow) {
+//                        error.put("Error", ResponseCodes.ACCESS_TOKEN_EXPIRED);
+//                        usersDao.update(sqlQuery2, tokenValue);
+//                        ApiResponse.sendResponse(exchange, error, 401);
+//                        return ResponseCodes.ERROR;
+//                    }
+//                } else if (timeToLiveUnits.toLowerCase().trim().equals("minutes")) {
+//                    if (dateCreatedTime + timeToLive * 60L * 1000L < timeNow) {
+//                        error.put("Error", ResponseCodes.ACCESS_TOKEN_EXPIRED);
+//                        usersDao.update(sqlQuery2, tokenValue);
+//                        ApiResponse.sendResponse(exchange, error, 401);
+//                        return ResponseCodes.ERROR;
+//                    }
+//                } else if (timeToLiveUnits.toLowerCase().trim().equals("hours") && dateCreatedTime + timeToLive * 60L * 60L * 1000L < timeNow) {
+//                    error.put("Error", ResponseCodes.ACCESS_TOKEN_EXPIRED);
+//                    usersDao.update(sqlQuery2, tokenValue);
+//                    ApiResponse.sendResponse(exchange, error, 401);
+//                    return ResponseCodes.ERROR;
+//                }
+//
+//                return ResponseCodes.SUCCESS;
+//            }
+            return ResponseCodes.SUCCESS;
         }
     }
 }

@@ -25,15 +25,16 @@ public class GetAllAuthDetails implements HttpHandler {
         String access_token = exchange.getRequestHeaders().get("access_token").getFirst();
         if (access_token != null && !access_token.equals("")) {
             QueryManager usersDao = new QueryManager();
-            String sqlQuery = "SELECT age(now(),date_updated) , * FROM public.auth_details where user_id = (:user_id) and identifier = (:identifier) and status = 'ACTIVE'";
+            String sqlQuery = "SELECT age(now(),date_updated) , * FROM public.auth_details where user_id = (:user_id) and status = 'ACTIVE' order by id";
+            //String sqlQuery = "SELECT age(now(),date_updated) , * FROM public.auth_details where user_id = (:user_id) and identifier = (:identifier) and status = 'ACTIVE'";
             ResponseCodes responseCodes = CheckAuthCodes.checkAndUpdateAccessTokens(exchange, access_token, exchange.getSourceAddress().getAddress().toString().replace("/", ""));
             if (responseCodes != ResponseCodes.ERROR) {
                 if (responseCodes == ResponseCodes.SUCCESS) {
                     LinkedHashMap<String, Object> values = new LinkedHashMap();
                     int userId = Integer.parseInt(ExchangeUtils.getQueryParam(exchange, "user_id"));
-                    String program_id = ExchangeUtils.getQueryParam(exchange, "identifier");
+                    //String program_id = ExchangeUtils.getQueryParam(exchange, "identifier");
                     values.put("user_id", userId);
-                    values.put("identifier", program_id);
+                    //values.put("identifier", program_id);
 
                     try {
                         List<LinkedHashMap<String, Object>> value = usersDao.getUserSpecificAuthDetails(sqlQuery, values);

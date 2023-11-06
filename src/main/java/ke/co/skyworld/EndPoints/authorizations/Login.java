@@ -95,6 +95,7 @@ public class Login implements HttpHandler {
                 List<LinkedHashMap<String, Object>> test = this.usersDao.getSpecificUsers(this.sqlQuery3, this.values2);
                 this.userConfigDetails = XmlReader.getUserDetails(this.personalConfigDetails, this.userType);
                 this.applicable = this.userConfigDetails.get("check").equals("YES");
+//                System.out.println(applicable);
                 this.multipleLoginsLimit = (Integer)this.userConfigDetails.get("login_limit");
                 this.loginTriesLimit = (Integer)this.userConfigDetails.get("login_tries_limit");
                 if (!test.isEmpty()) {
@@ -130,6 +131,8 @@ public class Login implements HttpHandler {
             if (!this.returnedValues.isEmpty()) {
                 String password = (String)this.returnedValues.get("password");
                 String check = Hashing.sha256().hashString(this.userName + password, StandardCharsets.UTF_8).toString();
+//                System.out.println("username: "+this.userName);
+//                System.out.println("password: "+password);
                 if (check.equals(this.authDetails)) {
                     String accessToken = generateRandomNumberAndHash().trim();
                     this.userid = this.returnedValues.get("user_id");

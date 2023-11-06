@@ -28,7 +28,13 @@ public class GetIdentifiers implements HttpHandler {
         Gson gson = new Gson();
         Type type = (new TypeToken<LinkedHashMap<String, Object>>() {
         }).getType();
-        String access_token = exchange.getRequestHeaders().get("access_token").getFirst();
+        System.out.println("headers"+  exchange.getRequestHeaders());
+        String access_token ;
+
+        access_token = exchange.getRequestHeaders().get("access_token").getFirst();
+
+
+
         if (access_token != null && !access_token.equals("")) {
             String sqlQuery = "SELECT* FROM public.identifier where user_id = (:user_id)";
             QueryManager usersDao = new QueryManager();
@@ -51,7 +57,6 @@ public class GetIdentifiers implements HttpHandler {
                         ApiResponse.sendResponse(exchange, error, 500);
                     }
                 }
-
             }
         } else {
             error.put("Error", ResponseCodes.ACCESS_TOKEN_REQUIRED);

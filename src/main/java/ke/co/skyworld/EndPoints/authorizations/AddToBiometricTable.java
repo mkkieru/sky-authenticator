@@ -12,9 +12,11 @@ import io.undertow.server.HttpServerExchange;
 
 import java.io.File;
 import java.lang.reflect.Type;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.sql.Connection;
+import java.util.*;
+
+import io.undertow.server.handlers.sse.ServerSentEventConnection;
+import io.undertow.server.handlers.sse.ServerSentEventHandler;
 import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
 import ke.co.skyworld.StatusCodesUpdaters.StatusCodesRefresher;
 import ke.co.skyworld.UTILS.ExchangeUtils;
@@ -23,8 +25,19 @@ import ke.co.skyworld.UserResponse.ApiResponse;
 import ke.co.skyworld.query_manager.QueryManager;
 import org.apache.commons.io.FileUtils;
 
-public class AddToBiometricTable implements HttpHandler {
-    public AddToBiometricTable() {
+public class AddToBiometricTable extends ServerSentEventHandler {
+
+    private static final AddToBiometricTable addToBiometricTable = new AddToBiometricTable();
+
+    public static Set<ServerSentEventConnection> connections =  new HashSet<>();
+
+    private AddToBiometricTable() {
+        connections = this.getConnections();
+
+    }
+
+    public static AddToBiometricTable getInstance(){
+        return addToBiometricTable;
     }
 
     public void handleRequest(HttpServerExchange httpServerExchange) throws Exception {
@@ -35,7 +48,7 @@ public class AddToBiometricTable implements HttpHandler {
         Gson gson = new Gson();
         Type type = (new TypeToken<LinkedHashMap<String, Object>>() {
         }).getType();
-        LinkedHashMap userAndProgramDetails = (LinkedHashMap)gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
+        LinkedHashMap userAndProgramDetails = gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
 
         try {
             HashMap<String, Object> QRdetails = queryManager.getSpecific(sqlQuery3, userAndProgramDetails);
@@ -63,6 +76,7 @@ public class AddToBiometricTable implements HttpHandler {
             LinkedHashMap<String, Object> temp = new LinkedHashMap();
             temp.put("Base64 QR image", encodedString);
             ApiResponse.sendResponse(httpServerExchange, temp, 200);
+
         } catch (Exception var19) {
             var19.printStackTrace();
             error.put("Error", ResponseCodes.SOMETHING_WENT_WRONG);

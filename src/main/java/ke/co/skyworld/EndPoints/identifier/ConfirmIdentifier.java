@@ -41,6 +41,7 @@ public class ConfirmIdentifier implements HttpHandler {
             ResponseCodes responseCodes = CheckAuthCodes.checkAndUpdateAccessTokens(exchange, access_token, exchange.getSourceAddress().getAddress().toString().replace("/", ""));
             if (responseCodes != ResponseCodes.ERROR) {
                 LinkedHashMap<String, Object> values = (LinkedHashMap)(new Gson()).fromJson(ExchangeUtils.getRequestBody(exchange), type);
+                System.out.println("User details : "+values);
                 Object token = values.get("token");
                 Object userId = values.get("user_id");
                 Object identifier_type = values.get("identifier_type");
@@ -53,6 +54,8 @@ public class ConfirmIdentifier implements HttpHandler {
 
                 try {
                     HashMap<String, Object> bufferDetails = usersDao.getSpecific(sqlquery, values);
+
+                    System.out.println("Database Results : "+bufferDetails);
                     if (!bufferDetails.isEmpty()) {
                         Object programId = bufferDetails.get("program_id");
                         usersDao.update(sqlquery2, values);
@@ -80,6 +83,7 @@ public class ConfirmIdentifier implements HttpHandler {
                         ApiResponse.sendResponse(exchange, error, 400);
                     }
                 } catch (Exception var22) {
+                    System.out.println("Here ... ");
                     var22.printStackTrace();
                     error.put("Error", ResponseCodes.SOMETHING_WENT_WRONG);
                     error.put("Message", var22.getMessage());

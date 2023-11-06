@@ -5,11 +5,13 @@
 
 package ke.co.skyworld.EndPoints.buffer;
 
+import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
@@ -31,6 +33,7 @@ public class AddToBuffer implements HttpHandler {
         LinkedHashMap<String, Object> values = (LinkedHashMap)(new Gson()).fromJson(ExchangeUtils.getRequestBody(exchange), type);
         if (this.checkInputFields(values, exchange) != ResponseCodes.ERROR) {
             try {
+                values.replace("token",Hashing.sha256().hashString((String) values.get("token"), StandardCharsets.UTF_8).toString());
                 usersDao.add(sqlQuery, values);
                 ApiResponse.sendResponse(exchange, values, 201);
             } catch (Exception var7) {

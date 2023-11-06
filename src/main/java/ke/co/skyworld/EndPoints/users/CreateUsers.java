@@ -10,12 +10,17 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+
 import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
 import ke.co.skyworld.UTILS.ExchangeUtils;
+import ke.co.skyworld.UTILS.GenerateOPT;
+import ke.co.skyworld.UTILS.SendMail;
 import ke.co.skyworld.UserResponse.ApiResponse;
 import ke.co.skyworld.query_manager.QueryManager;
 
@@ -33,17 +38,20 @@ public class CreateUsers implements HttpHandler {
         HashMap<String, Object> userDetails = null;
         Type type = (new TypeToken<LinkedHashMap<String, Object>>() {
         }).getType();
-        LinkedHashMap<String, Object> valuesMap = (LinkedHashMap)gson.fromJson(ExchangeUtils.getRequestBody(exchange), type);
+        LinkedHashMap<String, Object> valuesMap = (LinkedHashMap) gson.fromJson(ExchangeUtils.getRequestBody(exchange), type);
         if (this.verifyFields(valuesMap, exchange) != ResponseCodes.ERROR) {
             try {
-                String password = valuesMap.get("password").toString();
+                String userType = (String) valuesMap.get("user_type");
+//                String password = (GenerateOPT.generateOTP().toString());
+                String password = (valuesMap.get("password").toString());
                 String hashedPassword = Hashing.sha256().hashString(password, StandardCharsets.UTF_8).toString();
-                valuesMap.replace("password", hashedPassword);
-                String userType = (String)valuesMap.get("user_type");
+
                 Object i;
                 HashMap response;
                 if (userType.equals("ADMINISTRATOR")) {
                     valuesMap.put("personal_conf", admin_conf_details);
+                    valuesMap.put("password", hashedPassword);
+
                     i = usersDao.add(sqlQuery, valuesMap);
                     if (i.equals(ResponseCodes.ERROR)) {
                         response = new HashMap();
@@ -52,19 +60,42 @@ public class CreateUsers implements HttpHandler {
                         return;
                     }
 
+//                    try {
+//                        SendMail.sendMail((String) valuesMap.get("user_email"), "Your One Time Password is : " + password);
+//                    } catch (Exception e) {
+//                        HashMap<String, String> errorMap = new HashMap();
+//                        errorMap.put("error", e.getMessage());
+//                        ApiResponse.sendResponse(exchange, errorMap, 400);
+//                        return;
+//                    }
+
+
                     LinkedHashMap<String, Object> map = new LinkedHashMap();
                     map.put("user_id", i);
                     userDetails = usersDao.getSpecific(sqlQuery1, map);
                 } else if (userType.equals("MEMBER")) {
                     valuesMap.put("personal_conf", member_conf_details);
+                    valuesMap.put("password", hashedPassword);
+                    System.out.println(valuesMap);
                     i = usersDao.add(sqlQuery, valuesMap);
                     response = new HashMap();
                     if (i.getClass() == response.getClass()) {
                         HashMap<String, String> errorMap = new HashMap();
-                        errorMap.put("error", (String)((HashMap)i).get("reason"));
+                        errorMap.put("error", (String) ((HashMap) i).get("reason"));
                         ApiResponse.sendResponse(exchange, errorMap, 400);
                         return;
                     }
+
+                    //TODO: SEND EMAIL HERE TO CONFIRM REGISTRATION
+
+//                    try {
+//                        SendMail.sendMail((String) valuesMap.get("user_Email"), "Your One Time Password is : " + password);
+//                    } catch (Exception e) {
+//                        HashMap<String, String> errorMap = new HashMap();
+//                        errorMap.put("error", e.getMessage());
+//                        ApiResponse.sendResponse(exchange, errorMap, 400);
+//                        return;
+//                    }
 
                     LinkedHashMap<String, Object> map = new LinkedHashMap();
                     map.put("user_id", i);
@@ -75,8 +106,25 @@ public class CreateUsers implements HttpHandler {
             } catch (Exception var17) {
                 var17.printStackTrace();
                 HashMap<String, Object> errorMap = new HashMap();
+                if (var17.getMessage().contains("duplicate key value violates unique constraint")) {
+
+                    if (var17.getMessage().contains("user_national_id")) {
+                        errorMap.put("Message", "User already has an account with provided National ID");
+                        errorMap.put("Error", "Duplicate entry");
+                        ApiResponse.sendResponse(exchange, errorMap, 400);
+                        return;
+                    }
+                    if (var17.getMessage().contains("username")) {
+
+                        errorMap.put("Message", "Username already taken");
+                        errorMap.put("Error", "Duplicate entry");
+                        ApiResponse.sendResponse(exchange, errorMap, 400);
+                        return;
+                    }
+                }
                 errorMap.put("Error", ResponseCodes.SOMETHING_WENT_WRONG);
                 ApiResponse.sendResponse(exchange, errorMap, 500);
+                return;
             }
 
         }
@@ -100,12 +148,6 @@ public class CreateUsers implements HttpHandler {
             errorMap = new HashMap();
             errorMap.put("error", ResponseCodes.MISSING_FIELD);
             errorMap.put("message", "Please provide field 'national_id'");
-            ApiResponse.sendResponse(exchange, errorMap, 400);
-            return ResponseCodes.ERROR;
-        } else if (!valuesMap.containsKey("password")) {
-            errorMap = new HashMap();
-            errorMap.put("error", ResponseCodes.MISSING_FIELD);
-            errorMap.put("message", "Please provide field 'password'");
             ApiResponse.sendResponse(exchange, errorMap, 400);
             return ResponseCodes.ERROR;
         } else {

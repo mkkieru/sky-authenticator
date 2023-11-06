@@ -6,6 +6,8 @@
 package ke.co.skyworld.StatusCodesUpdaters;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -15,10 +17,18 @@ import ke.co.skyworld.XmlReader.XmlReader;
 import ke.co.skyworld.query_manager.QueryManager;
 
 public class ThreadPools {
+
+    static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    public static final LocalDateTime timeServerStarted = LocalDateTime.now();
+
     public ThreadPools() {
     }
 
     public static void startThreads() {
+
+        System.out.println("Server started at : "+dtf.format(timeServerStarted));
+
+
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
@@ -46,6 +56,7 @@ public class ThreadPools {
                         var11.printStackTrace();
                     }
 
+                    assert runnable != null;
                     executorService.execute(runnable);
                 }
 
@@ -58,6 +69,6 @@ public class ThreadPools {
                 }
 
             }
-        }, 2L, 1000L);
+        }, 0,60000);
     }
 }

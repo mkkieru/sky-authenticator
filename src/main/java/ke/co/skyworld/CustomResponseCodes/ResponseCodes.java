@@ -23,6 +23,6 @@ public enum ResponseCodes {
     ACCESS_TOKEN_EXPIRED,
     ACCESS_TOKEN_IS_VALID;
 
-    private ResponseCodes() {
+    ResponseCodes() {
     }
 }

@@ -19,14 +19,16 @@ public class StatusCodesRefresher implements Runnable {
     Object offset;
     long user_id;
     long program_id;
+    String identifier;
     QueryManager usersDao = new QueryManager();
     List<LinkedHashMap<String, Object>> allAuthCodes;
     List<LinkedHashMap<String, Object>> confirmedBiometrics;
     LinkedHashMap<String, Object> biometricID = new LinkedHashMap();
     LinkedHashMap<String, Object> values = new LinkedHashMap();
     LinkedHashMap<String, Object> limits = new LinkedHashMap();
-    String sqlQuery = "select date_updated + make_interval(secs => time_to_live ), user_id,program_id,time_to_live,time_to_live_units,date_updated FROM public.auth_details WHERE status = 'ACTIVE' LIMIT (:limit) OFFSET (:offset)";
-    String sqlQuery3 = "UPDATE public.auth_details SET auth_code = (:auth_code), time_to_live = (:time_to_live) , date_updated =CURRENT_TIMESTAMP WHERE user_id = (:user_id) and program_id = (:program_id);";
+    //String sqlQuery = "select date_updated + make_interval(secs => time_to_live ), identifier,user_id,program_id,time_to_live,time_to_live_units,date_updated FROM public.auth_details WHERE status = 'ACTIVE' LIMIT (:limit) OFFSET (:offset)";
+    String sqlQuery  = "select identifier,user_id,program_id,time_to_live,time_to_live_units,date_updated FROM public.auth_details WHERE status = 'ACTIVE' LIMIT (:limit) OFFSET (:offset)";
+    String sqlQuery3 = "UPDATE public.auth_details SET auth_code = (:auth_code), time_to_live = (:time_to_live), time_remaining = (:time_remaining) , isnew = :isnew ,date_updated = CURRENT_TIMESTAMP WHERE user_id = (:user_id) and program_id = (:program_id) and identifier = (:identifier)";
     String sqlQuery4 = "select * from biometric_confirmation where status = 'VERIFIED' LIMIT (:limit) OFFSET (:offset)";
     String sqlQuery5 = "delete from biometric_confirmation where id = (:id)";
     String sqlQuery6 = "delete from public.buffer where status = (:status)";
@@ -54,6 +56,7 @@ public class StatusCodesRefresher implements Runnable {
                 biometric = (LinkedHashMap)var2.next();
                 long timeToLive = (Long)biometric.get("time_to_live");
                 String timeToLiveUnits = (String)biometric.get("time_to_live_units");
+                identifier = (String) biometric.get("identifier");
                 this.user_id = (Long)biometric.get("user_id");
                 this.program_id = (Long)biometric.get("program_id");
                 Timestamp date_updated = (Timestamp)biometric.get("date_updated");
@@ -76,26 +79,27 @@ public class StatusCodesRefresher implements Runnable {
                             var10 = 0;
                         }
                 }
+                updateStatusCodes();
 
-                switch(var10) {
-                    case 0:
-                        date_updated.setTime(date_updated.getTime() + timeToLive * 1000L);
-                        if (date_updated.before(now)) {
-                            this.updateStatusCodes();
-                        }
-                        break;
-                    case 1:
-                        date_updated.setTime(date_updated.getTime() + timeToLive * 60L * 1000L);
-                        if (date_updated.before(now)) {
-                            this.updateStatusCodes();
-                        }
-                        break;
-                    case 2:
-                        date_updated.setTime(date_updated.getTime() + timeToLive * 60L * 60L * 1000L);
-                        if (date_updated.before(now)) {
-                            this.updateStatusCodes();
-                        }
-                }
+//                switch(var10) {
+//                    case 0:
+//                        date_updated.setTime(date_updated.getTime() + timeToLive * 1000L);
+//                        if (date_updated.before(now)) {
+//                            this.updateStatusCodes();
+//                        }
+//                        break;
+//                    case 1:
+//                        date_updated.setTime(date_updated.getTime() + timeToLive * 60L * 1000L);
+//                        if (date_updated.before(now)) {
+//                            this.updateStatusCodes();
+//                        }
+//                        break;
+//                    case 2:
+//                        date_updated.setTime(date_updated.getTime() + timeToLive * 60L * 60L * 1000L);
+//                        if (date_updated.before(now)) {
+//                            this.updateStatusCodes();
+//                        }
+//                }
             }
 
             var2 = this.confirmedBiometrics.iterator();
@@ -136,11 +140,18 @@ public class StatusCodesRefresher implements Runnable {
         }
     }
 
-    public void updateStatusCodes() throws Exception {
-        this.values.put("auth_code", genAuthCode(0));
-        this.values.put("user_id", this.user_id);
-        this.values.put("program_id", this.program_id);
-        this.values.put("time_to_live", XmlReader.AUTH_CODE_TTL);
-        this.usersDao.update(this.sqlQuery3, this.values);
+    public void updateStatusCodes() {
+        try{
+            this.values.put("auth_code", genAuthCode(0));
+            this.values.put("user_id", this.user_id);
+            this.values.put("identifier", this.identifier);
+            this.values.put("program_id", this.program_id);
+            this.values.put("time_remaining", XmlReader.AUTH_CODE_TTL);
+            this.values.put("time_to_live", XmlReader.AUTH_CODE_TTL);
+            this.values.put("isnew", "NO");
+            this.usersDao.update(this.sqlQuery3, this.values);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

@@ -25,11 +25,17 @@ public class SendConfirmationDetails implements HttpHandler {
         Gson gson = new Gson();
         HashMap<String, Object> error = new HashMap();
         QueryManager queryManager = new QueryManager();
-        String sqlQuery = "SELECT i.user_id,i.identifier, i.identifier_type , a.program_id , a.auth_code\nFROM public.identifier AS i \nINNER JOIN public.auth_details AS a\nON i.user_id = a.user_id\nWHERE a.auth_code = (:auth_code) and i.identifier = (:identifier) and i.identifier_type = (:identifier_type) and a.program_id = (:program_id) and a.status = 'ACTIVE'";
+        String sqlQuery = "SELECT i.user_id,i.identifier, i.identifier_type , a.program_id , a.auth_code\n" +
+                "FROM public.identifier AS i \n" +
+                "INNER JOIN public.auth_details AS a\n" +
+                "ON i.user_id = a.user_id\n" +
+                "WHERE a.auth_code = (:auth_code) and i.identifier = (:identifier) and a.identifier = (:identifier) and i.identifier_type = (:identifier_type) and a.program_id = (:program_id) and a.status = 'ACTIVE'";
         String sqlQuery2 = "update biometric_confirmation set status = 'VERIFIED' where identifier = (:identifier) and identifier_type = (:identifier_type) and program_id = (:program_id)";
         Type type = (new TypeToken<LinkedHashMap<String, Object>>() {
         }).getType();
-        LinkedHashMap userDetails = (LinkedHashMap)gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
+        LinkedHashMap userDetails = gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
+
+
 
         try {
             HashMap<String, Object> returnedValues = queryManager.getSpecific(sqlQuery, userDetails);

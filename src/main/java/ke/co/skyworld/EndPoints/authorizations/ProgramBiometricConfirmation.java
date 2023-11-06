@@ -10,13 +10,18 @@ import com.google.gson.reflect.TypeToken;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
+import java.sql.Connection;
+import java.util.*;
+
+import io.undertow.server.handlers.sse.ServerSentEventConnection;
+import io.undertow.server.handlers.sse.ServerSentEventHandler;
 import ke.co.skyworld.CustomResponseCodes.ResponseCodes;
 import ke.co.skyworld.UTILS.ExchangeUtils;
 import ke.co.skyworld.UserResponse.ApiResponse;
 import ke.co.skyworld.query_manager.QueryManager;
 
-public class ProgramBiometricConfirmation implements HttpHandler {
+//public class ProgramBiometricConfirmation implements HttpHandler {
+public class ProgramBiometricConfirmation extends ServerSentEventHandler {
     public ProgramBiometricConfirmation() {
     }
 
@@ -28,7 +33,9 @@ public class ProgramBiometricConfirmation implements HttpHandler {
         }).getType();
         QueryManager usersDao = new QueryManager();
         Gson gson = new Gson();
-        LinkedHashMap userDetails = (LinkedHashMap)gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
+        LinkedHashMap userDetails = gson.fromJson(ExchangeUtils.getRequestBody(httpServerExchange), type);
+
+        //Connection connections =  httpServerExchange.getConnection();
 
         try {
             LinkedHashMap<String, Object> dbResults = usersDao.getUserSpecificAuthDetail(sqlQuery, userDetails);
